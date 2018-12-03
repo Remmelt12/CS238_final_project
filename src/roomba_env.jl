@@ -62,10 +62,10 @@ Define the Roomba MDP.
 """
 @with_kw mutable struct RoombaMDP{SS,AS} <: MDP{RoombaState, RoombaAct}
     v_max::Float64  = 10.0  # m/s
-    om_max::Float64 = 1.0   # rad/s
+    om_max::Float64 = 5.0   # rad/s
     dt::Float64     = 0.5   # s
     contact_pen::Float64 = -1.0 
-    time_pen::Float64 = -0.1
+    time_pen::Float64 = 0.0
     goal_reward::Float64 = 10
     stairs_penalty::Float64 = -10
     config::Int = 1
@@ -103,8 +103,8 @@ function DiscreteRoombaStateSpace(num_x_pts::Int, num_y_pts::Int, num_theta_pts:
 
     # hardcoded room-limits
     # watch for consistency with env_room
-    XLIMS = [-30.0, 20.0]
-    YLIMS = [-30.0, 10.0] 
+    XLIMS = [-24.5, 14.5]
+    YLIMS = [-19.5, 4.5] 
 
     return DiscreteRoombaStateSpace((XLIMS[2]-XLIMS[1])/(num_x_pts-1),
                                     (YLIMS[2]-YLIMS[1])/(num_y_pts-1),
@@ -207,8 +207,8 @@ function POMDPs.initialstate(m::RoombaModel, rng::AbstractRNG)
     is = RoombaState(x, y, th, 0.0)
 
     if mdp(m).sspace isa DiscreteRoombaStateSpace
-        isi = stateindex(is)
-        is = index_to_state(isi)
+        isi = stateindex(m, is)
+        is = index_to_state(m, isi)
     end
 
     return is 
